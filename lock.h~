@@ -1,0 +1,13 @@
+#ifndef LOCK_MANAGER_H
+#define LOCK_MANAGER_H
+
+/**
+ * @file
+ * @brief Lock Manager structures, macros and defines
+ **/
+
+/**
+ *
+ *
+ **/
+#end//lock_manager.h

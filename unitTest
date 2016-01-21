@@ -1,0 +1,106 @@
+unit test of AVL tree.
+
+unit test 1: random insert into AVL to test insertion is successful and the balanced property is maintained or not, overnight tests, no crash and pass the insertion test.
+             random delete from AVL to test deletion is successful and the balanced propery is maintained or not, overnight tests, no crash and pass the deletion test.
+
+unit test 2: test a specific example with 6 nodes(including pending nodes) with several deletions, the result matches with the designed one.
+
+//----------------------------------------------------------
+unit test of lock/unlock:
+
+unit test 1: random request a large number of LBA range locks and then release those locks. no crashes.
+
+unit test 2: test a specific example with 6 nodes with lock requests and release, the running result matches with the expected one.
+
+unit test 3: integrate into the simulator, test a spefic example, passes.
+
+The unit is as belows:
+# Commands             LBA   SEC DATA(no spaces)
+NO  FTL_EQ_EVENT_R         504    20 ""
+NO  FTL_EQ_EVENT_W         504    20 "Write:2"
+NO  FTL_EQ_EVENT_R         504    20 ""
+HIL SLEEP                    2
+HIL HIL_SCHEDULE_EQ_EVENTS   1     1 ""
+HIL SLEEP                   10
+HIL HIL_SCHEDULE_EQ_EVENTS   1     1 ""
+HIL SLEEP                    8
+NO  FTL_EQ_EVENT_W        1002    10 "A"
+NO  FTL_EQ_EVENT_W        1082    40 "AB"
+HIL HIL_SCHEDULE_EQ_EVENTS   1     1 ""
+HIL SLEEP                   10
+NO  FTL_EQ_EVENT_R        1002    10 ""
+NO  FTL_EQ_EVENT_R        1082    40 ""
+HIL HIL_SCHEDULE_EQ_EVENTS   1     1 ""
+HIL SLEEP                   10
+HIL HIL_SCHEDULE_EQ_EVENTS   1     1 ""
+HIL SLEEP                   10
+TURN_DELAY_OFF
+FTL FTL_GC_NEW_STRIPE       20     1 ""
+FTL FTL_GC_NEW_STRIPE       21     1 ""
+FTL FTL_GC_NEW_STRIPE       22     1 ""
+FTL FTL_GC_NEW_STRIPE       23     1 ""
+FTL FTL_GC_NEW_STRIPE       24     1 ""
+FTL FTL_GC_NEW_STRIPE_H     31     1 ""
+FTL FTL_GC_NEW_STRIPE_H     32     1 ""
+FTL FTL_GC_NEW_STRIPE_H     33     1 ""
+FTL FTL_GC_NEW_STRIPE_H     34     1 ""
+TURN_DELAY_ON
+HIL SLEEP                   10
+HIL HIL_SCHEDULE_EQ_EVENTS   1     1 ""
+HIL SLEEP                    8
+#FTL FTL_QUIT               200     1 ""
+HIL HIL_SCHEDULE_EQ_EVENTS   1     1 ""
+HIL SLEEP                   10
+NO  FTL_EQ_EVENT_R        2100    26 ""
+NO  FTL_EQ_EVENT_W        2102    24 "ABC"
+NO  FTL_EQ_EVENT_R        2100    26 ""
+NO  FTL_EQ_EVENT_W        2102     4 "ABCD"
+NO  FTL_EQ_EVENT_R        2102     4 ""
+HIL HIL_SCHEDULE_EQ_EVENTS   1     1 ""
+HIL SLEEP                   10
+# Now, try trim
+FTL FTL_TRIM               201     1 ""
+HIL HIL_SCHEDULE_EQ_EVENTS   1     1 ""
+# Test Complete.
+HIL SLEEP                    8
+FTL FTL_QUIT               200     1 ""
+HIL NO_MESSAGE             202     1 ""EEP                    8
+
+unit test 4: try the following special input, and obtain the desired result (also test if we change the initial event index to force overflowing happens, our algorithm solves this).
+
+# Commands             LBA   SEC DATA(no spaces)
+NO FTL_EQ_EVENT_W         500    20 "500_-_20"
+NO FTL_EQ_EVENT_R         500    20 ""
+NO FTL_EQ_EVENT_W         501     3 "501_-_03"
+NO FTL_EQ_EVENT_W         505     1 "505_-_01"
+NO FTL_EQ_EVENT_W         509     4 "509_-_04"
+NO FTL_EQ_EVENT_W         50D     2 "50D_-_02"
+NO FTL_EQ_EVENT_W         511     2 "511_-_02"
+NO FTL_EQ_EVENT_W         515     1 "515_-_01"
+NO FTL_EQ_EVENT_W         519     1 "519_-_01"
+NO FTL_EQ_EVENT_W         51D     1 "51D_-_01"
+NO FTL_EQ_EVENT_W         521     1 "521_-_01"
+NO FTL_EQ_EVENT_R         500    20 ""
+HIL SLEEP                    2
+HIL HIL_SCHEDULE_EQ_EVENTS   1     1 ""
+HIL SLEEP                   10
+HIL HIL_SCHEDULE_EQ_EVENTS   1     1 ""
+HIL SLEEP                    8
+# Test Complete.
+HIL SLEEP                    8
+FTL FTL_QUIT               200     1 ""
+HIL NO_MESSAGE             202     1 ""
+
+
+unit test 5: try to run overnight (with the random seed 1), but it failed (stops at 708, it says EQ entry not aviable: read index = 22, write index = 27). Discuss issues with Larry.
+
+random seed 2, stops at 993, error message TST: EQ ENTRY not aviable: read index = 30, write index = 9;
+best case stops at 16912 secons with error message EQ ENTRY not aviable: read index = 30, write index = 5;
+
+random seed 3, stops at 717 (error message EQ ENTRY NOT AVIABLE: read index = 19, write index = 27), the problem is due to lock manager.
+
+//---------------------------------------------------------
+unit test of queuing:
+unit test 1: randomly request  7,500 logical block address range locks (no pending), then randomly queue 7,500 logical block address range lock requests, and randomly release locks. no crashes.    
+
+unit test 2: test a specific example with 6 nodes with lock requests and release, the running result matches with the expected one.
